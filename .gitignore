@@ -16,7 +16,6 @@ tmp/
 *.swp
 *~.nib
 local.properties
-.settings/org.eclipse.jdt.core.prefs
 .loadpath
 .recommenders
 
