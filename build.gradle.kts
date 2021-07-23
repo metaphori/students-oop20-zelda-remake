@@ -7,6 +7,8 @@ plugins {
     id("de.aaschmid.cpd")
     id("com.github.spotbugs")
     `build-dashboard`
+    id("com.github.johnrengelman.shadow") version "5.2.0"
+    application
 }
 
 sourceSets {
@@ -15,6 +17,7 @@ sourceSets {
             srcDirs("src")
         }
         resources {
+            srcDirs("src")
             srcDirs("res")
             srcDirs("resources")
         }
@@ -42,37 +45,43 @@ val javaFXModules = listOf(
   "controls",
   "fxml",
   "swing",
-  "graphics"
+  "graphics",
+  "media",
+  "web"
 )
 
 val supportedPlatforms = listOf("linux", "mac", "win") // All required for OOP
 
 val javaFxVersion = 14
 
-dependencies {
-    for (platform in supportedPlatforms) {
-      for (module in javaFXModules) {
-          implementation("org.openjfx:javafx-$module:$javaFxVersion:$platform")
-      }
-    }
-    implementation("junit:junit:_")
-    implementation("org.junit.jupiter:junit-jupiter-api:_")
-    runtimeOnly("org.junit.jupiter:junit-jupiter-engine:_")
-    runtimeOnly("org.junit.vintage:junit-vintage-engine:_")
-    File("lib")
-        .takeIf { it.exists() }
-        ?.takeIf { it.isDirectory }
-        ?.listFiles()
-        ?.filter { it.extension == "jar" }
-        ?.forEach { implementation(files("lib/${it.name}")) }
+    dependencies {
+        for (platform in supportedPlatforms) {
+          for (module in javaFXModules) {
+              implementation("org.openjfx:javafx-$module:$javaFxVersion:$platform")
+          }
+        }
+        implementation("junit:junit:_")
+        implementation("org.junit.jupiter:junit-jupiter-api:_")
+        runtimeOnly("org.junit.jupiter:junit-jupiter-engine:_")
+        runtimeOnly("org.junit.vintage:junit-vintage-engine:_")
+        File("lib")
+            .takeIf { it.exists() }
+            ?.takeIf { it.isDirectory }
+            ?.listFiles()
+            ?.filter { it.extension == "jar" }
+            ?.forEach { implementation(files("lib/${it.name}")) }
 
-}
+    }
+
 
 allprojects {
     apply(plugin = "checkstyle")
     apply(plugin = "pmd")
     apply(plugin = "de.aaschmid.cpd")
     apply(plugin = "com.github.spotbugs")
+    apply(plugin = "application")
+    apply(plugin = "com.github.johnrengelman.shadow")
+
 
     tasks.withType<Test> {
         ignoreFailures = true
@@ -325,4 +334,9 @@ allprojects {
             file(output).writeText(report)
         }
     }
+}
+
+application {
+    // Define the main class for the application
+    mainClassName = "application.TrueMain"
 }
